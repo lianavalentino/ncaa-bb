@@ -86,23 +86,25 @@ def predict():
         # Step 1: Download the trained model
         model_path = download_model_from_gcs()
         model = joblib.load(model_path)
-        
+
         # Step 2: Parse input data
         input_data = request.get_json()
-        features = np.array([
-            [
-                input_data['h_eFGp'], input_data['h_FTr'], input_data['h_ORBp'], input_data['h_TOVp'],
-                input_data['a_eFGp'], input_data['a_FTr'], input_data['a_ORBp'], input_data['a_TOVp']
-            ]
-        ])
+        features = np.array([input_data['features']])
+        # features = np.array([
+        #     [
+        #         input_data['h_eFGp'], input_data['h_FTr'], input_data['h_ORBp'], input_data['h_TOVp'],
+        #         input_data['a_eFGp'], input_data['a_FTr'], input_data['a_ORBp'], input_data['a_TOVp']
+        #     ]
+        # ])
         
         # Step 3: Make prediction
         prediction = model.predict(features)
+        result = "home_win" if prediction[0] == 1 else "away_win"
         probabilities = model.predict_proba(features)
         
         # Step 4: Return response
         return jsonify({
-            "prediction": int(prediction[0]),  # 1 = Home win, 0 = Away win
+            "result": result,  # 1 = Home win, 0 = Away win
             "probabilities": {
                 "home_win": probabilities[0][1],
                 "away_win": probabilities[0][0]
