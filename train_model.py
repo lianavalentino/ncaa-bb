@@ -32,6 +32,7 @@ def train_model():
     # Step 2: Load the dataset
     print("Loading dataset...")
     data = pd.read_csv(local_data_file)
+    data.dropna(inplace=True)
 
     # Filter only the features starting with h_ and a_ for training
     features = [col for col in data.columns if col.startswith("h_") or col.startswith("a_")]
