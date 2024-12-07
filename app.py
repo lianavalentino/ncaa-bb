@@ -1,12 +1,21 @@
 from flask import Flask, request, jsonify
 import pickle
 import numpy as np
+from google.cloud import storage
 
 app = Flask(__name__)
 
 # Load the model
-with open("model.pkl", "rb") as f:
-    model = pickle.load(f)
+def load_model():
+    client = storage.Client()
+    bucket = client.bucket("ncaa_bb")
+    blob = bucket.blob("model.pkl")
+    blob.download_to_filename("model.pkl")
+
+    with open("model.pkl", "rb") as f:
+        return pickle.load(f)
+
+model = load_model()
 
 @app.route('/predict', methods=['POST'])
 def predict():
